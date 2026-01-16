@@ -1,0 +1,9 @@
+aws_region              = "us-east-1"
+s3_bucket               = "your-bucket-name"
+s3_key                  = "path/to/your/file.csv"
+kafka_bootstrap_servers = "b-1.your-msk.kafka.us-east-1.amazonaws.com:9092,b-2.your-msk.kafka.us-east-1.amazonaws.com:9092"
+kafka_topic             = "your-topic-name"
+msk_cluster_arn         = "arn:aws:kafka:us-east-1:123456789012:cluster/your-cluster/uuid"
+vpc_id                  = "vpc-xxxxx"
+subnet_ids              = ["subnet-xxxxx", "subnet-yyyyy"]
+job_id                  = "csv-job-1"
