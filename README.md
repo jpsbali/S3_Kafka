@@ -1,4 +1,5 @@
 # CSV to Kafka Sequential Processor - AWS Solutions
+# Spec coded using Kiro
 
 Three production-ready solutions for processing 100M rows from S3 to Kafka with guaranteed delivery and ordering.
 
