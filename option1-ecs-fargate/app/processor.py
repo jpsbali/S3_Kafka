@@ -193,7 +193,7 @@ class CSVToKafkaProcessor:
             acks='all',  # Wait for all replicas
             retries=2147483647,  # Retry indefinitely
             max_block_ms=60000,  # Wait up to 60s for buffer space
-            enable_idempotence=True,  # Prevents duplicates
+            enable_idempotency=True,  # Prevents duplicates
             compression_type='gzip'
         )
         

@@ -17,54 +17,67 @@
 ## Deploy in 3 Steps
 
 ### Option 1: ECS Fargate
-```bash
-cd option1-ecs-fargate/terraform
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars
-terraform init && terraform apply
-cd ../app && docker build -t csv-to-kafka .
-# Push to ECR (see deploy.sh)
+```cmd
+cd option1-ecs-fargate\terraform
+copy terraform.tfvars.example terraform.tfvars
+REM Edit terraform.tfvars with your values
+terraform init
+terraform apply
+cd ..\app
+docker build -t csv-to-kafka .
+REM Push to ECR (see deploy.sh)
 aws ecs run-task --cluster csv-to-kafka-cluster --task-definition csv-to-kafka-task ...
 ```
 
 ### Option 2: AWS Batch
-```bash
-cd option2-aws-batch/terraform
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars
-terraform init && terraform apply
-cd ../app && docker build -t csv-to-kafka .
-# Push to ECR (see deploy.sh)
+```cmd
+cd option2-aws-batch\terraform
+copy terraform.tfvars.example terraform.tfvars
+REM Edit terraform.tfvars with your values
+terraform init
+terraform apply
+cd ..\app
+docker build -t csv-to-kafka .
+REM Push to ECR (see deploy.sh)
 aws batch submit-job --job-name csv-job --job-queue csv-kafka-job-queue --job-definition csv-kafka-job-def
 ```
 
 ### Option 3: EC2 Spot
-```bash
+```cmd
 cd option3-ec2-spot
-# Edit user-data.sh with your config
+REM Edit user-data.sh with your config
 aws ec2 run-instances --image-id ami-xxxxx --instance-type t3.medium --user-data file://user-data.sh ...
-# Or use Terraform
-cd terraform && terraform init && terraform apply
+REM Or use Terraform
+cd terraform
+terraform init
+terraform apply
 ```
 
 ---
 
 ## Monitor Progress
 
-```bash
-# Check progress (every 10 seconds)
-watch -n 10 'aws dynamodb get-item --table-name csv-kafka-checkpoint --key "{\"job_id\":{\"S\":\"csv-job-1\"}}"'
+```cmd
+REM Check progress in DynamoDB
+aws dynamodb get-item --table-name csv-kafka-checkpoint --key "{\"job_id\":{\"S\":\"csv-job-1\"}}"
 
-# View logs
+REM View logs
 aws logs tail /ecs/csv-to-kafka --follow
 
-# Check Kafka
-kafka-run-class kafka.tools.GetOffsetShell --broker-list $KAFKA_BROKERS --topic csv-import --time -1
+REM Check Kafka offset
+kafka-run-class kafka.tools.GetOffsetShell --broker-list %KAFKA_BROKERS% --topic csv-import --time -1
 
-# View CloudWatch Dashboard (NEW!)
-# Get URL from Terraform output
+REM View CloudWatch Dashboard (NEW!)
+REM Get URL from Terraform output
 terraform output dashboard_url
-# Or navigate to: CloudWatch → Dashboards → csv-to-kafka-metrics-{job_id}
+REM Or navigate to: CloudWatch → Dashboards → csv-to-kafka-metrics-{job_id}
+
+REM Run Tests (NEW!)
+cd tests
+python -m pytest unit/ -v
+python -m pytest unit/ --cov=option1-ecs-fargate/app --cov-report=html
+python -m pytest unit/test_checkpoint_manager.py -v
+python -m pytest integration/ -v
 ```
 
 ---
@@ -72,25 +85,25 @@ terraform output dashboard_url
 ## Troubleshoot
 
 ### Task Won't Start
-```bash
+```cmd
 aws ecs describe-tasks --cluster csv-to-kafka-cluster --tasks <task-arn>
-# Check stoppedReason
+REM Check stoppedReason
 ```
 
 ### Processing Stopped
-```bash
-# Check last checkpoint
-aws dynamodb get-item --table-name csv-kafka-checkpoint --key '{"job_id":{"S":"csv-job-1"}}'
+```cmd
+REM Check last checkpoint
+aws dynamodb get-item --table-name csv-kafka-checkpoint --key "{\"job_id\":{\"S\":\"csv-job-1\"}}"
 
-# Check logs for errors
+REM Check logs for errors
 aws logs filter-log-events --log-group-name /ecs/csv-to-kafka --filter-pattern "ERROR"
 ```
 
 ### Restart from Checkpoint
-```bash
-# Just restart the task/job with same job_id
+```cmd
+REM Just restart the task/job with same job_id
 aws ecs run-task --cluster csv-to-kafka-cluster --task-definition csv-to-kafka-task ...
-# It will automatically resume
+REM It will automatically resume
 ```
 
 ---
@@ -98,14 +111,15 @@ aws ecs run-task --cluster csv-to-kafka-cluster --task-definition csv-to-kafka-t
 ## Key Configuration
 
 ### Required Environment Variables
-```bash
-S3_BUCKET=my-bucket
-S3_KEY=data/file.csv
-KAFKA_BOOTSTRAP_SERVERS=b-1.msk.amazonaws.com:9092
-KAFKA_TOPIC=csv-import
-DYNAMODB_TABLE=csv-kafka-checkpoint
-JOB_ID=csv-job-1
-ENABLE_METRICS=true  # NEW! Enable CloudWatch metrics
+```cmd
+set S3_BUCKET=my-bucket
+set S3_KEY=data/file.csv
+set KAFKA_BOOTSTRAP_SERVERS=b-1.msk.amazonaws.com:9092
+set KAFKA_TOPIC=csv-import
+set DYNAMODB_TABLE=csv-kafka-checkpoint
+set JOB_ID=csv-job-1
+set ENABLE_METRICS=true
+REM NEW! Enable CloudWatch metrics
 ```
 
 ### Kafka Producer Settings
@@ -121,39 +135,39 @@ enable_idempotence=True                   # No duplicates
 ## Important Commands
 
 ### AWS CLI
-```bash
-# ECS
+```cmd
+REM ECS
 aws ecs list-tasks --cluster csv-to-kafka-cluster
 aws ecs describe-tasks --cluster csv-to-kafka-cluster --tasks <arn>
 aws ecs stop-task --cluster csv-to-kafka-cluster --task <arn>
 
-# Batch
+REM Batch
 aws batch list-jobs --job-queue csv-kafka-job-queue
 aws batch describe-jobs --jobs <job-id>
 aws batch terminate-job --job-id <job-id> --reason "Manual stop"
 
-# DynamoDB
-aws dynamodb get-item --table-name csv-kafka-checkpoint --key '{"job_id":{"S":"csv-job-1"}}'
-aws dynamodb delete-item --table-name csv-kafka-checkpoint --key '{"job_id":{"S":"csv-job-1"}}'
+REM DynamoDB
+aws dynamodb get-item --table-name csv-kafka-checkpoint --key "{\"job_id\":{\"S\":\"csv-job-1\"}}"
+aws dynamodb delete-item --table-name csv-kafka-checkpoint --key "{\"job_id\":{\"S\":\"csv-job-1\"}}"
 
-# CloudWatch
+REM CloudWatch
 aws logs tail /ecs/csv-to-kafka --follow
 aws logs filter-log-events --log-group-name /ecs/csv-to-kafka --filter-pattern "ERROR"
 ```
 
 ### Kafka
-```bash
-# List topics
-kafka-topics --bootstrap-server $KAFKA_BROKERS --list
+```cmd
+REM List topics
+kafka-topics --bootstrap-server %KAFKA_BROKERS% --list
 
-# Describe topic
-kafka-topics --bootstrap-server $KAFKA_BROKERS --describe --topic csv-import
+REM Describe topic
+kafka-topics --bootstrap-server %KAFKA_BROKERS% --describe --topic csv-import
 
-# Check offset (record count)
-kafka-run-class kafka.tools.GetOffsetShell --broker-list $KAFKA_BROKERS --topic csv-import --time -1
+REM Check offset (record count)
+kafka-run-class kafka.tools.GetOffsetShell --broker-list %KAFKA_BROKERS% --topic csv-import --time -1
 
-# Consume last 10 records
-kafka-console-consumer --bootstrap-server $KAFKA_BROKERS --topic csv-import --partition 0 --offset -10 --max-messages 10
+REM Consume last 10 records
+kafka-console-consumer --bootstrap-server %KAFKA_BROKERS% --topic csv-import --partition 0 --offset -10 --max-messages 10
 ```
 
 ---
@@ -170,6 +184,8 @@ kafka-console-consumer --bootstrap-server $KAFKA_BROKERS --topic csv-import --pa
 - `option*/app/processor.py` - Main application
 - `option*/terraform/main.tf` - Infrastructure
 - `option*/terraform/variables.tf` - Configuration
+- `tests/unit/test_*.py` - Unit tests (47 tests, 70% coverage) 🆕
+- `tests/README.md` - Testing guide 🆕
 
 ### Configuration
 - `option*/terraform/terraform.tfvars` - Your settings (create from .example)
@@ -259,6 +275,8 @@ kafka-console-consumer --bootstrap-server $KAFKA_BROKERS --topic csv-import --pa
 3. **Architecture:** [ARCHITECTURE.md](ARCHITECTURE.md)
 4. **Code Reference:** [DOCUMENTATION.md](DOCUMENTATION.md)
 5. **Dashboard Guide:** [DASHBOARD_GUIDE.md](DASHBOARD_GUIDE.md) 🆕
+6. **Testing Guide:** [tests/README.md](tests/README.md) 🆕
+7. **Test Results:** [TESTING_COMPLETION_SUMMARY.md](TESTING_COMPLETION_SUMMARY.md) 🆕
 
 ---
 

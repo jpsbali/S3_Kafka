@@ -21,6 +21,9 @@ This index helps you find the right documentation for your needs.
 | [OPERATIONS.md](OPERATIONS.md) | Deployment and operations guide | DevOps, operators |
 | [GUARANTEES.md](GUARANTEES.md) | Data delivery guarantees explained | Everyone |
 | [COMPARISON.md](COMPARISON.md) | Solution comparison matrix | Decision makers |
+| [TESTING_PLAN.md](tests/TESTING_PLAN.md) | Complete testing strategy | Developers, QA |
+| [TESTING_COMPLETION_SUMMARY.md](TESTING_COMPLETION_SUMMARY.md) | Test results and coverage | Everyone |
+| [tests/README.md](tests/README.md) | Testing setup and execution guide | Developers |
 
 ---
 
@@ -64,6 +67,9 @@ This index helps you find the right documentation for your needs.
 - **API reference** → [DOCUMENTATION.md](DOCUMENTATION.md) (Core Components section)
 - **Modify processor** → [DOCUMENTATION.md](DOCUMENTATION.md) (Code Examples section)
 - **Add features** → [PROJECT_SPEC.md](PROJECT_SPEC.md) (Future Enhancements)
+- **Run tests** → [tests/README.md](tests/README.md) 🆕
+- **Understand test coverage** → [TESTING_COMPLETION_SUMMARY.md](TESTING_COMPLETION_SUMMARY.md) 🆕
+- **Add new tests** → [TESTING_PLAN.md](tests/TESTING_PLAN.md) 🆕
 
 #### Maintain the System
 - **Regular maintenance** → [OPERATIONS.md](OPERATIONS.md) (Maintenance section)
@@ -277,7 +283,8 @@ This index helps you find the right documentation for your needs.
 - **Performance** → [DOCUMENTATION.md](DOCUMENTATION.md) (Performance), [COMPARISON.md](COMPARISON.md) (Performance)
 - **Cost** → [COMPARISON.md](COMPARISON.md) (Cost), [OPERATIONS.md](OPERATIONS.md) (Cost Management)
 - **Security** → [ARCHITECTURE.md](ARCHITECTURE.md) (Security Groups), [DOCUMENTATION.md](DOCUMENTATION.md) (Security)
-- **Testing** → [DOCUMENTATION.md](DOCUMENTATION.md) (Testing), [PROJECT_SPEC.md](PROJECT_SPEC.md) (Testing Strategy)
+- **Testing** → [TESTING_PLAN.md](tests/TESTING_PLAN.md), [TESTING_COMPLETION_SUMMARY.md](TESTING_COMPLETION_SUMMARY.md) 🆕
+- **Metrics** → [DASHBOARD_GUIDE.md](DASHBOARD_GUIDE.md), [METRICS_ENHANCEMENT_SUMMARY.md](METRICS_ENHANCEMENT_SUMMARY.md) 🆕
 
 ### Development Topics
 - **Python Code** → [DOCUMENTATION.md](DOCUMENTATION.md) (Core Components)
@@ -311,6 +318,7 @@ Save these for quick access:
 - **Quick Start:** [README.md](README.md)
 - **Cheat Sheet:** [QUICK_REFERENCE.md](QUICK_REFERENCE.md) ⭐
 - **Dashboard:** [DASHBOARD_GUIDE.md](DASHBOARD_GUIDE.md) 🆕
+- **Testing:** [TESTING_COMPLETION_SUMMARY.md](TESTING_COMPLETION_SUMMARY.md) 🆕
 - **Deployment:** [OPERATIONS.md](OPERATIONS.md) → Pre-Deployment Checklist
 - **Troubleshooting:** [OPERATIONS.md](OPERATIONS.md) → Troubleshooting
 - **API Reference:** [DOCUMENTATION.md](DOCUMENTATION.md) → Core Components
